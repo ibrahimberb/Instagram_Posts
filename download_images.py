@@ -9,7 +9,7 @@ class InstagramImageDownloader:
         self.username = username
         self.directory = directory
 
-    def download_instagram_images(self):
+    def download_instagram_images(self, top_n=None):
         print(f"Downloading images from the profile '{self.username}'...")
         loader = instaloader.Instaloader()
 
@@ -19,13 +19,18 @@ class InstagramImageDownloader:
 
         try:
             profile = instaloader.Profile.from_username(loader.context, self.username)
-            for post in tqdm(profile.get_posts(), desc="Downloading posts"):
+            for i, post in tqdm(
+                enumerate(profile.get_posts()), desc="Downloading posts"
+            ):
                 file_path = f"{self.directory}/{post.date_utc.strftime('%Y-%m-%d_%H-%M-%S')}.jpg"
                 loader.download_pic(
                     filename=file_path,
                     url=post.url,
                     mtime=post.date_utc,
                 )
+
+                if i == top_n:
+                    break
 
             print("All images downloaded successfully!")
 
@@ -34,6 +39,7 @@ class InstagramImageDownloader:
 
 
 if __name__ == "__main__":
-    username = "ts.lyrics13"
+    # username = "ts.lyrics13"
+    username = "ltayswiftl"
     iid = InstagramImageDownloader(username)
-    iid.download_instagram_images()
+    iid.download_instagram_images(top_n=25)
